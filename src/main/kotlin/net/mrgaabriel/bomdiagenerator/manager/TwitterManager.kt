@@ -20,10 +20,10 @@ class TwitterManager(val config: BomDiaConfig) {
 
     init {
         val configuration = ConfigurationBuilder()
-            .setOAuthConsumerKey(config.consumerKey)
-            .setOAuthConsumerSecret(config.consumerSecret)
-            .setOAuthAccessToken(config.accessToken)
-            .setOAuthAccessTokenSecret(config.accessSecret)
+            .setOAuthConsumerKey(config.twitter.consumerKey)
+            .setOAuthConsumerSecret(config.twitter.consumerSecret)
+            .setOAuthAccessToken(config.twitter.accessToken)
+            .setOAuthAccessTokenSecret(config.twitter.accessSecret)
             .build()
 
         twitter = TwitterFactory(configuration).instance

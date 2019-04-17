@@ -21,15 +21,25 @@ object BomDiaGenerator {
 
         if (!configFile.exists()) {
             configFile.createNewFile()
-            configFile.writeText(Gson().toJson(BomDiaConfig("Consumer Key", "Consumer Secret", "Access Token", "Access Secret")))
+            configFile.writeText(Gson().toJson(BomDiaConfig(
+                BomDiaConfig.TwitterConfig(
+                    false,
+                    "Consumer Key",
+                    "Consumer Secret",
+                    "Access Token",
+                    "Access Secret"
+                )
+            )))
         }
 
         config = Gson().fromJson(configFile.readText(Charsets.UTF_8), BomDiaConfig::class.java)
 
         imageGenerator = ImageGenerator()
-        twitterManager = TwitterManager(config)
 
-        twitterManager.startThread()
+        if (config.twitter.enabled) {
+            twitterManager = TwitterManager(config)
+            twitterManager.startThread()
+        }
 
         thread(name = "Console Commands Handler") {
             while (true) {
