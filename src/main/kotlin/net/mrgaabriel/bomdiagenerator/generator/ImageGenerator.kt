@@ -1,15 +1,12 @@
 package net.mrgaabriel.bomdiagenerator.generator
 
 import com.github.kevinsawicki.http.HttpRequest
-import net.mrgaabriel.bomdiagenerator.BomDiaGenerator
-import net.mrgaabriel.bomdiagenerator.utils.drawCenteredString
 import net.mrgaabriel.bomdiagenerator.utils.drawCenteredStringWrapOutline
 import net.mrgaabriel.bomdiagenerator.utils.drawStringOutline
 import net.mrgaabriel.bomdiagenerator.utils.graphics
 import org.jsoup.Jsoup
 import java.awt.Color
 import java.awt.Font
-import java.awt.Rectangle
 import java.awt.image.BufferedImage
 import java.io.File
 import java.time.OffsetDateTime
@@ -19,7 +16,15 @@ import java.util.*
 import javax.imageio.ImageIO
 
 class ImageGenerator {
-
+    val colors = listOf(
+        Color(220,64,72), // vermelho
+        Color(255, 255, 255), // branco
+        Color(246,130,31), // laranja
+        Color(254,185,19), // amarelo
+        Color(122,205,241), // azul claro
+        Color(255,79,121), // rosa
+        Color(42,201,133) // verde
+    )
     fun generateImage(): BufferedImage {
         val date = OffsetDateTime.now()
         val dateFormatted = date.format(DateTimeFormatter.ofPattern("dd/MM/YYYY"))
@@ -32,21 +37,31 @@ class ImageGenerator {
         val charlotte = Font.createFont(Font.PLAIN, File("assets", "charlotte.ttf"))
 
         graphics.font = charlotte.deriveFont(96f)
-        graphics.color = Color.WHITE
+        graphics.color = colors.random()
 
-        graphics.drawCenteredStringWrapOutline("Bom dia!", 700, 160)
+        graphics.drawCenteredStringWrapOutline("Bom dia!", 700, 160, 6)
 
-        val arial = Font.createFont(Font.PLAIN, File("assets", "arial.ttf"))
+        val ubuntuItalic = Font.createFont(Font.PLAIN, File("assets", "Ubuntu-Italic.ttf"))
+        val ubuntuRegular = Font.createFont(Font.PLAIN, File("assets", "Ubuntu-Regular.ttf"))
 
-        graphics.font = arial.deriveFont(40f)
-        graphics.drawCenteredStringWrapOutline("${quote.phrase} - ${quote.author}", 700, 400)
+        graphics.color = colors.random()
+        graphics.font = ubuntuItalic.deriveFont(40f)
+        val endY = graphics.drawCenteredStringWrapOutline(quote.phrase, 700, 400, 4)
 
-        graphics.font = arial.deriveFont(27f)
+        graphics.font = ubuntuRegular.deriveFont(27f)
+        val quoteAuthor = "- ${quote.author}"
+        graphics.drawStringOutline(quoteAuthor, 700 - graphics.fontMetrics.stringWidth(quoteAuthor) - 10, endY, 2)
 
-        graphics.drawCenteredStringWrapOutline("${date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.forLanguageTag("pt-br"))} • $dateFormatted", 700, 1200)
+        graphics.font = ubuntuRegular.deriveFont(21f)
 
-        graphics.drawStringOutline("@${BomDiaGenerator.twitterManager.twitter.screenName}", 540, 660)
-        graphics.drawStringOutline("bomdia.lori.fun", 520, 690)
+        graphics.color = colors.random()
+        graphics.drawStringOutline("${date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.forLanguageTag("pt-br"))} • $dateFormatted", 10, 690, 2)
+
+        val handle = "@bomdiazap"
+        val url = "https://bomdia.lori.fun"
+
+        graphics.drawStringOutline(handle, 700 - graphics.fontMetrics.stringWidth(handle) - 10, 660, 2)
+        graphics.drawStringOutline("https://bomdia.lori.fun", 700 - graphics.fontMetrics.stringWidth(url) - 10, 690, 2)
 
         println("Image generated successfully!")
 

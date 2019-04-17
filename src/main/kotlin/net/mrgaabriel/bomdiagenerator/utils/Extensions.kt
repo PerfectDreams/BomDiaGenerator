@@ -3,7 +3,7 @@ package net.mrgaabriel.bomdiagenerator.utils
 import java.awt.*
 import java.awt.image.BufferedImage
 
-fun Graphics.drawCenteredStringWrap(text: String, width: Int, height: Int) {
+fun Graphics.drawCenteredStringWrap(text: String, width: Int, height: Int): Int {
     // Para escrever uma imagem centralizada, nós precisamos primeiro saber algumas coisas sobre o texto
 
     // Lista contendo (texto, posição)
@@ -51,34 +51,37 @@ fun Graphics.drawCenteredStringWrap(text: String, width: Int, height: Int) {
         this.drawCenteredString(line, Rectangle(0, y, width, 24))
         y += skipHeight
     }
+
+    return y
 }
 
-fun Graphics.drawCenteredStringWrapOutline(text: String, width: Int, height: Int) {
+fun Graphics.drawCenteredStringWrapOutline(text: String, width: Int, height: Int, strokeSize: Int = 2): Int {
     val lastColor = this.color
 
     // Fazer o outline
     this.color = Color.BLACK
 
-    for (diffX in -2..2) {
-        for (diffY in -2..2) {
+    for (diffX in -strokeSize..strokeSize) {
+        for (diffY in -strokeSize..strokeSize) {
             drawCenteredStringWrap(text, width + diffX, height + diffY)
         }
     }
 
     this.color = lastColor
-    this.drawCenteredStringWrap(text, width, height)
+    return this.drawCenteredStringWrap(text, width, height)
 }
 
-fun Graphics.drawStringOutline(text: String, x: Int, y: Int) {
+fun Graphics.drawStringOutline(text: String, x: Int, y: Int, strokeSize: Int = 2) {
     val lastColor = this.color
 
     // Fazer o outline
     this.color = Color.BLACK
 
-    this.drawString(text, x - 1, y)
-    this.drawString(text, x + 1, y)
-    this.drawString(text, x, y - 1)
-    this.drawString(text, x, y + 1)
+    for (diffX in -strokeSize..strokeSize) {
+        for (diffY in -strokeSize..strokeSize) {
+            this.drawString(text, x + diffX, y + diffY)
+        }
+    }
 
     this.color = lastColor
     this.drawString(text, x, y)

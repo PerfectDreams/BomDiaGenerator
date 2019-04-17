@@ -49,6 +49,11 @@ object BomDiaGenerator {
                     "force_tweet" -> {
                         twitterManager.tweetBomDiaImage()
                     }
+                    "generate" -> {
+                        val output = imageGenerator.generateImage()
+                        ImageIO.write(output, "png", File("bom-dia.png"))
+                        println("Done!")
+                    }
                 }
             }
         }
