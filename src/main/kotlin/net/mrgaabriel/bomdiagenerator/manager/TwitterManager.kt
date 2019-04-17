@@ -7,6 +7,8 @@ import twitter4j.StatusUpdate
 import twitter4j.Twitter
 import twitter4j.TwitterFactory
 import twitter4j.conf.ConfigurationBuilder
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.time.OffsetDateTime
 import javax.imageio.ImageIO
@@ -29,13 +31,11 @@ class TwitterManager(val config: BomDiaConfig) {
 
     fun tweetBomDiaImage(): Status {
         val image = BomDiaGenerator.imageGenerator.generateImage()
-        val file = File("tmp-${System.currentTimeMillis()}.png")
+        val baos = ByteArrayOutputStream()
+        ImageIO.write(image, "png", baos)
+        val bais = ByteArrayInputStream(baos.toByteArray())
 
-        ImageIO.write(image, "png", file)
-
-        val status = twitter.updateStatus(StatusUpdate("Bom dia, grupo do zap! #GoodMorningWorld #GoodMorning #BomDia").media(file))
-
-        file.delete()
+        val status = twitter.updateStatus(StatusUpdate("Bom dia, grupo do zap! #GoodMorningWorld #GoodMorning #BomDia").media("bom-dia.png", bais))
 
         println("Tweeted successfully! https://twitter.com/${twitter.screenName}/status/${twitter.id}")
         return status
