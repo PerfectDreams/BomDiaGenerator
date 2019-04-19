@@ -1,6 +1,7 @@
 package net.mrgaabriel.bomdiagenerator
 
 import com.google.gson.Gson
+import mu.KotlinLogging
 import net.mrgaabriel.bomdiagenerator.config.BomDiaConfig
 import net.mrgaabriel.bomdiagenerator.generator.ImageGenerator
 import net.mrgaabriel.bomdiagenerator.manager.TwitterManager
@@ -14,6 +15,8 @@ object BomDiaGenerator {
 
     lateinit var imageGenerator: ImageGenerator
     lateinit var twitterManager: TwitterManager
+
+    val logger = KotlinLogging.logger {}
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -30,6 +33,10 @@ object BomDiaGenerator {
                     "Access Secret"
                 )
             )))
+
+            logger.warn { "Looks like it's the first time you're running BomDiaGenerator!" }
+            logger.warn { "Please configure the app in the file \"config.json\"" }
+            return
         }
 
         config = Gson().fromJson(configFile.readText(Charsets.UTF_8), BomDiaConfig::class.java)
@@ -52,13 +59,13 @@ object BomDiaGenerator {
                     "generate" -> {
                         val output = imageGenerator.generateImage()
                         ImageIO.write(output, "png", File("bom-dia.png"))
-                        println("Done!")
+                        logger.info { "Done!" }
                     }
                 }
             }
         }
 
-        println("Alright! \"BomDiaGenerator\" started successfully!!!")
+        logger.info { "Alright! \"BomDiaGenerator\" started successfully!!!" }
     }
 
 }

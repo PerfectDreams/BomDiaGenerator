@@ -1,20 +1,21 @@
 package net.mrgaabriel.bomdiagenerator.manager
 
+import mu.KotlinLogging
 import net.mrgaabriel.bomdiagenerator.BomDiaGenerator
 import net.mrgaabriel.bomdiagenerator.config.BomDiaConfig
-import twitter4j.Status
-import twitter4j.StatusUpdate
-import twitter4j.Twitter
-import twitter4j.TwitterFactory
+import net.mrgaabriel.bomdiagenerator.listener.TwitterListeners
+import twitter4j.*
+import twitter4j.auth.AccessToken
 import twitter4j.conf.ConfigurationBuilder
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.time.OffsetDateTime
 import javax.imageio.ImageIO
 import kotlin.concurrent.thread
 
 class TwitterManager(val config: BomDiaConfig) {
+    val logger = KotlinLogging.logger {}
+
     val randomEmotes = listOf(
         "\uD83D\uDE0A",
         "\uD83C\uDF1E",
@@ -24,6 +25,7 @@ class TwitterManager(val config: BomDiaConfig) {
     )
 
     var twitter: Twitter
+    var twitterStream: TwitterStream
 
     init {
         val configuration = ConfigurationBuilder()
@@ -34,9 +36,19 @@ class TwitterManager(val config: BomDiaConfig) {
             .build()
 
         twitter = TwitterFactory(configuration).instance
+
+        twitterStream = TwitterStreamFactory(configuration).instance
+        twitterStream.oAuthAccessToken = AccessToken(config.twitter.accessToken, config.twitter.accessSecret);
+        twitterStream.addListener(TwitterListeners(this))
+
+        val tweetFilterQuery = FilterQuery()
+        tweetFilterQuery.track("bomdiazap")
+        twitterStream.filter(tweetFilterQuery)
     }
 
     fun tweetBomDiaImage(): Status {
+        logger.info { "Tweeting image..." }
+
         val image = BomDiaGenerator.imageGenerator.generateImage()
         val baos = ByteArrayOutputStream()
         ImageIO.write(image, "png", baos)
@@ -44,7 +56,7 @@ class TwitterManager(val config: BomDiaConfig) {
 
         val status = twitter.updateStatus(StatusUpdate("Bom dia, grupo do zap! ${randomEmotes.random()}\n\n#GoodMorningWorld #GoodMorning #BomDia").media("bom-dia.png", bais))
 
-        println("Tweeted successfully! https://twitter.com/${twitter.screenName}/status/${twitter.id}")
+        logger.info { "Tweeted successfully! https://twitter.com/${twitter.screenName}/status/${twitter.id}" }
         return status
     }
 

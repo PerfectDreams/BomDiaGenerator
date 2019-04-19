@@ -1,6 +1,7 @@
 package net.mrgaabriel.bomdiagenerator.generator
 
 import com.github.kevinsawicki.http.HttpRequest
+import mu.KotlinLogging
 import net.mrgaabriel.bomdiagenerator.utils.drawCenteredStringWrapOutline
 import net.mrgaabriel.bomdiagenerator.utils.drawStringOutline
 import net.mrgaabriel.bomdiagenerator.utils.graphics
@@ -25,6 +26,9 @@ class ImageGenerator {
         Color(255,79,121), // rosa
         Color(42,201,133) // verde
     )
+
+    val logger = KotlinLogging.logger {}
+
     fun generateImage(): BufferedImage {
         val date = OffsetDateTime.now()
         val dateFormatted = date.format(DateTimeFormatter.ofPattern("dd/MM/YYYY"))
@@ -63,7 +67,7 @@ class ImageGenerator {
         graphics.drawStringOutline(handle, 700 - graphics.fontMetrics.stringWidth(handle) - 10, 660, 2)
         graphics.drawStringOutline("https://bomdia.lori.fun", 700 - graphics.fontMetrics.stringWidth(url) - 10, 690, 2)
 
-        println("Image generated successfully!")
+        logger.info { "Image generated successfully!" }
 
         return image
     }
@@ -79,7 +83,7 @@ class ImageGenerator {
             throw RuntimeException("Request for \"$url\" is not OK! Code: ${request.code()}")
         }
 
-        println("Random image fetched successfully! ${request.url()}")
+        logger.debug { "Random image fetched successfully! ${request.url()}" }
 
         return ImageIO.read(request.stream())
     }
@@ -101,7 +105,7 @@ class ImageGenerator {
         val author = jsoup.selectFirst("#mw-content-text > div > div > div:nth-child(2) > table > tbody > tr:nth-child(2) > td:nth-child(1) > p > a").text()
 
         val quote = Quote(phrase, author)
-        println("Quote fetched successfully! $quote")
+        logger.debug { "Quote fetched successfully! $quote" }
 
         return quote
     }
