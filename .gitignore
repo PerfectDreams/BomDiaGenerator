@@ -5,3 +5,4 @@ config.json
 *.png
 logs/
 dependency-reduced-pom.xml
+assets/
